@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>کاتی بانگەکان | قورئان و زیکر</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Vazirmatn & Amiri (for Quranic Arabic) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Vazirmatn', 'sans-serif'],
+                        quran: ['Amiri', 'serif'],
+                    },
+                    colors: {
+                        dark: {
+                            950: '#070B0E',
+                            900: '#0D1318',
+                            800: '#141D24',
+                            700: '#1D2933',
+                        },
+                        emerald: {
+                            450: '#10B981',
+                            550: '#059669',
+                        },
+                        gold: {
+                            400: '#FBBF24',
+                            500: '#D97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar & Smooth Mobile App Feel */
+        body {
+            background-color: #070B0E;
+            color: #F3F4F6;
+            font-family: 'Vazirmatn', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* Hide scrollbars cleanly while keeping scroll functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Smooth View Transitions */
+        .app-section {
+            display: none;
+            animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .app-section.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: linear-gradient(145deg, rgba(20, 29, 36, 0.85), rgba(13, 19, 24, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+        }
+
+        .active-prayer-glow {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(217, 119, 6, 0.12));
+            border: 1px solid rgba(16, 185, 129, 0.45);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.15);
+        }
+
+        /* Quran Frame Container to hide external headers/footers cleanly */
+        .quran-embed-wrapper {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 155px);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            background: #0D1318;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .quran-embed-wrapper iframe {
+            width: 100%;
+            height: calc(100% + 60px);
+            margin-top: -54px; /* Crops top external branding bar cleanly */
+            border: none;
+            filter: invert(0.92) hue-rotate(180deg) contrast(1.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between pb-24 selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top App Header -->
+    <header class="sticky top-0 z-30 bg-dark-950/85 backdrop-blur-xl border-b border-white/5 px-4 py-3.5">
+        <div class="max-w-lg mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <i data-lucide="moon-star" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 id="header-title" class="text-base font-bold text-white tracking-tight">کاتی بانگەکان</h1>
+                        <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25" dir="ltr">farzad developer</span>
+                    </div>
+                    <p id="current-date-display" class="text-[11px] text-gray-400">بارکردنی بەروار...</p>
+                </div>
+            </div>
+            <div id="live-clock" class="text-sm font-bold text-emerald-400 bg-dark-800/90 px-3 py-1.5 rounded-xl border border-white/5 tabular-nums">
+                00:00:00
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 w-full max-w-lg mx-auto px-4 pt-4">
+
+        <!-- ========================================================= -->
+        <!-- SECTION 1: PRAYER TIMES (کاتی بانگەکان)                     -->
+        <!-- ========================================================= -->
+        <section id="section-prayers" class="app-section active space-y-4">
+
+            <!-- City & District Selector Trigger -->
+            <div class="glass-card rounded-2xl p-3.5">
+                <label class="block text-xs text-gray-400 mb-1.5 font-medium">شار یان قەزاکەت هەڵبژێرە (کوردستان):</label>
+                <button id="open-city-modal-btn" type="button" class="w-full flex items-center justify-between bg-dark-900 hover:bg-dark-700/70 transition-colors border border-white/10 rounded-xl px-4 py-3 text-right">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span id="selected-city-name" class="block text-sm font-bold text-white">هەولێر (ناوەند)</span>
+                            <span id="selected-city-gov" class="block text-[11px] text-gray-400">پارێزگای هەولێر</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 text-xs text-emerald-400 font-medium bg-emerald-500/10 px-2.5 py-1 rounded-lg">
+                        <span>گۆڕین</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Next Prayer Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-900/60 via-dark-800 to-dark-900 border border-emerald-500/25 p-5 shadow-2xl">
+                <div class="absolute -left-8 -top-8 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+                <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
+
+                <div class="relative z-10 flex items-center justify-between">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-300 bg-emerald-500/15 px-2.5 py-1 rounded-full mb-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                            بانگی داهاتوو
+                        </span>
+                        <h2 id="next-prayer-name" class="text-2xl font-extrabold text-white mb-0.5">بانگی نیوەڕۆ</h2>
+                        <p class="text-xs text-gray-300">کاتی ماوە بۆ بانگ:</p>
+                    </div>
+                    <div class="text-left">
+                        <div id="next-prayer-countdown" class="text-2xl sm:text-3xl font-extrabold text-amber-400 tabular-nums tracking-wider">
+                            --:--:--
+                        </div>
+                        <div id="next-prayer-exact-time" class="text-xs text-gray-300 mt-1 font-medium">
+                            کاتژمێر --:--
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6 Prayer Times Cards Grid -->
+            <div id="prayer-list-container" class="space-y-2.5">
+                <!-- Populated dynamically by JS -->
+            </div>
+
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- SECTION 2: AZKAR (زیکرەکان)                                -->
+        <!-- ========================================================= -->
+        <section id="section-azkar" class="app-section space-y-4">
+
+            <!-- Category Filter Pills -->
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1" id="azkar-tabs">
+                <button data-cat="morning" class="azkar-tab-btn active shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all">
+                    زیکرەکانی بەیانیان
+                </button>
+                <button data-cat="evening" class="azkar-tab-btn shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-dark-800 text-gray-300 hover:bg-dark-700 border border-white/5 transition-all">
+                    زیکرەکانی ئێواران
+                </button>
+                <button data-cat="afterPrayer" class="azkar-tab-btn shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-dark-800 text-gray-300 hover:bg-dark-700 border border-white/5 transition-all">
+                    دوای نوێژەکان
+                </button>
+                <button data-cat="tasbih" class="azkar-tab-btn shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-dark-800 text-gray-300 hover:bg-dark-700 border border-white/5 transition-all">
+                    تەسبیحات
+                </button>
+            </div>
+
+            <!-- Reset All Counters Button -->
+            <div class="flex items-center justify-between px-1">
+                <span id="azkar-category-subtitle" class="text-xs text-gray-400">کرتە لە هەر زیکرێک بکە بۆ ژماردن</span>
+                <button id="reset-azkar-btn" class="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 bg-amber-500/10 px-2.5 py-1 rounded-lg">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    سفرکردنەوە
+                </button>
+            </div>
+
+            <!-- Azkar Cards List -->
+            <div id="azkar-list-container" class="space-y-3 pb-4">
+                <!-- Populated dynamically by JS -->
+            </div>
+
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- SECTION 3: HOLY QURAN (قورئانی پیرۆز)                      -->
+        <!-- ========================================================= -->
+        <section id="section-quran" class="app-section space-y-3">
+
+            <!-- Mode Switcher: Built-in Surah Reader vs Full Embedded Mushaf -->
+            <div class="flex items-center justify-between bg-dark-800/90 p-1.5 rounded-2xl border border-white/5">
+                <button id="quran-mode-embed" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-emerald-500 text-white shadow transition-all">
+                    قورئانی تەواو (موسحەف)
+                </button>
+                <button id="quran-mode-surahs" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition-all">
+                    لیستی سوڕەتەکان (١١٤)
+                </button>
+            </div>
+
+            <!-- Sub-view A: Clean Embedded Full Quran (No External Website Name Shown) -->
+            <div id="quran-embed-view" class="quran-embed-wrapper shadow-2xl">
+                <div id="quran-iframe-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-dark-900 z-10">
+                    <div class="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mb-3"></div>
+                    <p class="text-xs text-gray-300">کردنەوەی قورئانی پیرۆز...</p>
+                </div>
+                <iframe
+                    id="quran-iframe"
+                    src="about:blank"
+                    title="قورئانی پیرۆز"
+                    loading="lazy"
+                    sandbox="allow-scripts allow-same-origin allow-forms">
+                </iframe>
+            </div>
+
+            <!-- Sub-view B: Fast Native Surah List & Reader -->
+            <div id="quran-surahs-view" class="hidden space-y-3">
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute right-3.5 top-3.5"></i>
+                    <input type="text" id="surah-search-input" placeholder="گەڕان بەدوای ناوی سوڕەت (بۆ نموونە: البقرة، الكهف، يس)..."
+                           class="w-full bg-dark-800 border border-white/10 rounded-xl pr-10 pl-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <!-- Surah List Container -->
+                <div id="surah-list-grid" class="grid grid-cols-1 gap-2 max-h-[65vh] overflow-y-auto no-scrollbar pb-4">
+                    <!-- Populated via JS -->
+                </div>
+
+                <!-- Single Surah Reading Modal/Drawer -->
+                <div id="surah-reader-box" class="hidden glass-card rounded-2xl p-4 space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                        <button id="back-to-surahs-btn" class="flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            گەڕانەوە
+                        </button>
+                        <h3 id="reader-surah-title" class="font-quran text-xl font-bold text-amber-400">سورة الفاتحة</h3>
+                        <span id="reader-surah-meta" class="text-[11px] text-gray-400">مەدەنی</span>
+                    </div>
+                    <div id="reader-ayahs-content" class="font-quran text-2xl leading-[2.4] text-right text-gray-100 max-h-[60vh] overflow-y-auto no-scrollbar px-1" dir="rtl">
+                        <!-- Ayahs loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Developer Credit Footer -->
+        <footer class="mt-6 mb-4 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-dark-900/90 border border-white/10 shadow-md">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-xs font-semibold tracking-wide text-gray-300" dir="ltr">farzad developer</span>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- ========================================================= -->
+    <!-- CITY & DISTRICT SELECTOR MODAL (شار و قەزاکانی کوردستان)   -->
+    <!-- ========================================================= -->
+    <div id="city-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-dark-900 border border-white/10 w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-[fadeSlideUp_0.25s_ease-out]">
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-white/10 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-white">شار و قەزاکانی کوردستان</h3>
+                    <p class="text-xs text-gray-400">شار یان قەزاکەت هەڵبژێرە بۆ کاتی بانگی دروست</p>
+                </div>
+                <button id="close-city-modal-btn" class="w-9 h-9 rounded-xl bg-dark-800 hover:bg-dark-700 flex items-center justify-center text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Search Box -->
+            <div class="p-3 bg-dark-950/60 border-b border-white/5">
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute right-3.5 top-3"></i>
+                    <input type="text" id="city-search-input" placeholder="ناوی شار یان قەزا بنووسە (سۆران، زاخۆ، ڕانیە، کەلار...)"
+                           class="w-full bg-dark-800 border border-white/10 rounded-xl pr-10 pl-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+                </div>
+            </div>
+
+            <!-- Cities List -->
+            <div id="cities-list-container" class="flex-1 overflow-y-auto p-3 space-y-1.5 no-scrollbar">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- BOTTOM NAVIGATION BAR (3 ICONS WITH LABELS)               -->
+    <!-- ========================================================= -->
+    <nav class="fixed bottom-0 inset-x-0 z-40 bg-dark-900/95 backdrop-blur-xl border-t border-white/10 px-2 py-2 safe-area-bottom">
+        <div class="max-w-lg mx-auto grid grid-cols-3 gap-1">
+
+            <!-- Tab 1: کاتی بانگەکان -->
+            <button data-target="section-prayers" data-title="کاتی بانگەکان" class="nav-btn active flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all text-emerald-400 bg-emerald-500/10">
+                <div class="relative">
+                    <i data-lucide="clock" class="w-6 h-6 mb-1"></i>
+                </div>
+                <span class="text-[11px] font-bold tracking-tight">کاتی بانگەکان</span>
+            </button>
+
+            <!-- Tab 2: زیکرەکان -->
+            <button data-target="section-azkar" data-title="زیکرەکان" class="nav-btn flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all text-gray-400 hover:text-gray-200">
+                <div class="relative">
+                    <i data-lucide="heart-handshake" class="w-6 h-6 mb-1"></i>
+                </div>
+                <span class="text-[11px] font-bold tracking-tight">زیکرەکان</span>
+            </button>
+
+            <!-- Tab 3: قورئانی پیرۆز -->
+            <button data-target="section-quran" data-title="قورئانی پیرۆز" class="nav-btn flex flex-col items-center justify-center py-1.5 px-2 rounded-2xl transition-all text-gray-400 hover:text-gray-200">
+                <div class="relative">
+                    <i data-lucide="book-open" class="w-6 h-6 mb-1"></i>
+                </div>
+                <span class="text-[11px] font-bold tracking-tight">قورئانی پیرۆز</span>
+            </button>
+
+        </div>
+    </nav>
+
+    <!-- ========================================================= -->
+    <!-- JAVASCRIPT LOGIC                                          -->
+    <!-- ========================================================= -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // -------------------------------------------------------------
+        // 1. COMPREHENSIVE KURDISTAN CITIES & DISTRICTS DATABASE
+        // -------------------------------------------------------------
+        const kurdistanCities = [
+            // پارێزگای هەولێر
+            { id: 'erbil', name: 'هەولێر (ناوەند)', gov: 'پارێزگای هەولێر', lat: 36.1911, lng: 44.0092 },
+            { id: 'soran', name: 'سۆران', gov: 'ئیدارەی سەربەخۆی سۆران', lat: 36.6525, lng: 44.5414 },
+            { id: 'shaqlawa', name: 'شەقڵاوە', gov: 'پارێزگای هەولێر', lat: 36.4044, lng: 44.3256 },
+            { id: 'koya', name: 'کۆیە', gov: 'پارێزگای هەولێر', lat: 36.0831, lng: 44.6292 },
+            { id: 'rawanduz', name: 'ڕەواندز', gov: 'ئیدارەی سەربەخۆی سۆران', lat: 36.6122, lng: 44.5247 },
+            { id: 'choman', name: 'چۆمان', gov: 'ئیدارەی سەربەخۆی سۆران', lat: 36.6367, lng: 44.8889 },
+            { id: 'mergasor', name: 'مێرگەسۆر', gov: 'ئیدارەی سەربەخۆی سۆران', lat: 36.8392, lng: 44.3036 },
+            { id: 'khabat', name: 'خەبات', gov: 'پارێزگای هەولێر', lat: 36.2722, lng: 43.6719 },
+            { id: 'dashti_hawler', name: 'دەشتی هەولێر (بنەسڵاوە)', gov: 'پارێزگای هەولێر', lat: 36.1436, lng: 44.1328 },
+            { id: 'makhmur', name: 'مەخموور', gov: 'پارێزگای هەولێر', lat: 35.7764, lng: 43.5797 },
+            { id: 'taqtaq', name: 'تەقتەق', gov: 'پارێزگای هەولێر', lat: 35.8856, lng: 44.5889 },
+            { id: 'harir', name: 'هەریر', gov: 'پارێزگای هەولێر', lat: 36.5519, lng: 44.3556 },
+            { id: 'khalifan', name: 'خەلیفان', gov: 'ئیدارەی سەربەخۆی سۆران', lat: 36.6094, lng: 44.4028 },
+            { id: 'sidakan', name: 'سیدەکان', gov: 'ئیدارەی سەربەخۆی سۆران', lat: 36.7989, lng: 44.6514 },
+
+            // پارێزگای سلێمانی و ئیدارەی ڕاپەڕین و گەرمیان
+            { id: 'sulaymaniyah', name: 'سلێمانی (ناوەند)', gov: 'پارێزگای سلێمانی', lat: 35.5558, lng: 45.4351 },
+            { id: 'ranya', name: 'ڕانیە', gov: 'ئیدارەی سەربەخۆی ڕاپەڕین', lat: 36.2575, lng: 44.8828 },
+            { id: 'qaladiza', name: 'قەڵادزێ (پشدەر)', gov: 'ئیدارەی سەربەخۆی ڕاپەڕین', lat: 36.1833, lng: 45.1264 },
+            { id: 'chamchamal', name: 'چەمچەماڵ', gov: 'پارێزگای سلێمانی', lat: 35.5333, lng: 44.8333 },
+            { id: 'kalar', name: 'کەلار', gov: 'ئیدارەی سەربەخۆی گەرمیان', lat: 34.6292, lng: 45.3222 },
+            { id: 'kifri', name: 'کفری', gov: 'ئیدارەی سەربەخۆی گەرمیان', lat: 34.6897, lng: 44.9606 },
+            { id: 'darbandikhan', name: 'دەربەندیخان', gov: 'پارێزگای سلێمانی', lat: 35.1119, lng: 45.6878 },
+            { id: 'said_sadiq', name: 'سەیدسادق', gov: 'پارێزگای سلێمانی', lat: 35.3514, lng: 45.8622 },
+            { id: 'penjwen', name: 'پێنجوێن', gov: 'پارێزگای سلێمانی', lat: 35.6214, lng: 45.9486 },
+            { id: 'dukan', name: 'دوکان', gov: 'پارێزگای سلێمانی', lat: 35.9542, lng: 44.9525 },
+            { id: 'sharazur', name: 'شارەزوور (هەڵەبجەی تازە)', gov: 'پارێزگای سلێمانی', lat: 35.2917, lng: 45.8472 },
+            { id: 'bazian', name: 'بازیان', gov: 'پارێزگای سلێمانی', lat: 35.5892, lng: 45.1408 },
+            { id: 'chwarqurna', name: 'چوارقوڕنە', gov: 'ئیدارەی سەربەخۆی ڕاپەڕین', lat: 36.2153, lng: 44.8331 },
+            { id: 'hajiawa', name: 'حاجیاوا', gov: 'ئیدارەی سەربەخۆی ڕاپەڕین', lat: 36.2356, lng: 44.7892 },
+            { id: 'sharbazher', name: 'شارباژێڕ (چوارتا)', gov: 'پارێزگای سلێمانی', lat: 35.7219, lng: 45.5736 },
+            { id: 'mawat', name: 'ماوەت', gov: 'پارێزگای سلێمانی', lat: 35.9014, lng: 45.4119 },
+            { id: 'qaradagh', name: 'قەرەداغ', gov: 'پارێزگای سلێمانی', lat: 35.3094, lng: 45.3917 },
+
+            // پارێزگای دهۆک و ئیدارەی زاخۆ
+            { id: 'duhok', name: 'دهۆک (ناوەند)', gov: 'پارێزگای دهۆک', lat: 36.8669, lng: 42.9885 },
+            { id: 'zakho', name: 'زاخۆ', gov: 'ئیدارەی سەربەخۆی زاخۆ', lat: 37.1445, lng: 42.6819 },
+            { id: 'akre', name: 'ئاکرێ', gov: 'پارێزگای دهۆک', lat: 36.7414, lng: 43.8933 },
+            { id: 'amedi', name: 'ئامێدی', gov: 'پارێزگای دهۆک', lat: 37.0925, lng: 43.4872 },
+            { id: 'semel', name: 'سێمێل', gov: 'پارێزگای دهۆک', lat: 36.8583, lng: 42.8500 },
+            { id: 'bardarash', name: 'بەردەڕەش', gov: 'پارێزگای دهۆک', lat: 36.5042, lng: 43.5856 },
+            { id: 'shekhan', name: 'شێخان', gov: 'پارێزگای دهۆک', lat: 36.6958, lng: 43.3522 },
+            { id: 'batifa', name: 'باتیفا', gov: 'ئیدارەی سەربەخۆی زاخۆ', lat: 37.1819, lng: 43.0114 },
+
+            // پارێزگای هەڵەبجە
+            { id: 'halabja', name: 'هەڵەبجە (ناوەند)', gov: 'پارێزگای هەڵەبجە', lat: 35.1786, lng: 45.9864 },
+            { id: 'khurmal', name: 'خورماڵ', gov: 'پارێزگای هەڵەبجە', lat: 35.2981, lng: 46.0369 },
+            { id: 'sirwan', name: 'سیروان', gov: 'پارێزگای هەڵەبجە', lat: 35.2361, lng: 45.9250 },
+            { id: 'byara', name: 'بیارە و تەوێڵە', gov: 'پارێزگای هەڵەبجە', lat: 35.2244, lng: 46.1211 },
+
+            // ناوچە کوردستانییەکانی دەرەوەی ئیدارەی هەرێم
+            { id: 'kirkuk', name: 'کەرکوک', gov: 'پارێزگای کەرکوک', lat: 35.4681, lng: 44.3922 },
+            { id: 'khanaqin', name: 'خانەقین', gov: 'دیالە / گەرمیان', lat: 34.3483, lng: 45.3906 },
+            { id: 'tuz', name: 'خورماتوو (دووز)', gov: 'سەڵاحەددین', lat: 34.8881, lng: 44.6325 },
+            { id: 'shingal', name: 'شنگال', gov: 'نەینەوا', lat: 36.3208, lng: 41.8764 }
+        ];
+
+        // -------------------------------------------------------------
+        // 2. ASTRONOMICAL PRAYER TIMES CALCULATOR (MWL / IRAQ STANDARD)
+        // -------------------------------------------------------------
+        function calculatePrayerTimes(date, lat, lng, timezone = 3) {
+            const D2R = Math.PI / 180;
+            const R2D = 180 / Math.PI;
+
+            // Julian Date
+            let year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            let day = date.getDate();
+            if (month <= 2) {
+                year -= 1;
+                month += 12;
+            }
+            const A = Math.floor(year / 100);
+            const B = 2 - A + Math.floor(A / 4);
+            const JD = Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+
+            const d = JD - 2451545.0;
+            const g = (357.529 + 0.98560028 * d) % 360;
+            const q = (280.459 + 0.98564736 * d) % 360;
+            const L = (q + 1.915 * Math.sin(g * D2R) + 0.020 * Math.sin(2 * g * D2R)) % 360;
+            const e = 23.439 - 0.00000036 * d;
+
+            const RA = Math.atan2(Math.cos(e * D2R) * Math.sin(L * D2R), Math.cos(L * D2R)) * R2D / 15;
+            const EqT = (q / 15) - ((RA + 24) % 24);
+            const Decl = Math.asin(Math.sin(e * D2R) * Math.sin(L * D2R)) * R2D;
+
+            // Dhuhr (Midday) + 2 mins safety margin per Kurdistan Awqaf standard
+            const Dhuhr = 12 + timezone - (lng / 15) - EqT + (2 / 60);
+
+            function sunAngleTime(angle, isMorning) {
+                const cosH = (Math.sin(angle * D2R) - Math.sin(lat * D2R) * Math.sin(Decl * D2R)) /
+                             (Math.cos(lat * D2R) * Math.cos(Decl * D2R));
+                const H = Math.acos(Math.max(-1, Math.min(1, cosH))) * R2D / 15;
+                return isMorning ? Dhuhr - H : Dhuhr + H;
+            }
+
+            // Standard angles (Fajr 18°, Sunrise -0.833°, Maghrib -0.833°, Isha 17.5°)
+            const Fajr = sunAngleTime(-18.0, true);
+            const Sunrise = sunAngleTime(-0.833, true);
+
+            // Asr (Shafi'i / Standard factor = 1)
+            const asrAngle = Math.atan(1 / (1 + Math.tan(Math.abs(lat - Decl) * D2R))) * R2D;
+            const Asr = sunAngleTime(asrAngle, false);
+
+            const Maghrib = sunAngleTime(-0.833, false) + (3 / 60); // +3 min Awqaf precaution
+            const Isha = sunAngleTime(-17.5, false);
+
+            return {
+                fajr: Fajr,
+                sunrise: Sunrise,
+                dhuhr: Dhuhr,
+                asr: Asr,
+                maghrib: Maghrib,
+                isha: Isha
+            };
+        }
+
+        function formatHoursToTime(hoursFloat) {
+            let totalMinutes = Math.round(hoursFloat * 60);
+            totalMinutes = ((totalMinutes % 1440) + 1440) % 1440;
+            const h = Math.floor(totalMinutes / 60);
+            const m = totalMinutes % 60;
+            return {
+                hours: h,
+                minutes: m,
+                formatted: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+            };
+        }
+
+        // -------------------------------------------------------------
+        // 3. STATE MANAGEMENT & PRAYER TIMES RENDERING
+        // -------------------------------------------------------------
+        let selectedCity = JSON.parse(localStorage.getItem('selectedKurdistanCity')) || kurdistanCities[0];
+        let todayPrayers = [];
+
+        const prayerMeta = [
+            { key: 'fajr', name: 'بانگی بەیانی', icon: 'sunrise', color: 'text-sky-400' },
+            { key: 'sunrise', name: 'خۆرهەڵاتن', icon: 'sun', color: 'text-amber-300' },
+            { key: 'dhuhr', name: 'بانگی نیوەڕۆ', icon: 'sun-medium', color: 'text-yellow-400' },
+            { key: 'asr', name: 'بانگی عەسر', icon: 'cloud-sun', color: 'text-orange-400' },
+            { key: 'maghrib', name: 'بانگی مەغریب', icon: 'sunset', color: 'text-rose-400' },
+            { key: 'isha', name: 'بانگی عیشا', icon: 'moon', color: 'text-indigo-400' }
+        ];
+
+        function updateSelectedCityUI() {
+            document.getElementById('selected-city-name').textContent = selectedCity.name;
+            document.getElementById('selected-city-gov').textContent = selectedCity.gov;
+
+            const now = new Date();
+            const rawTimes = calculatePrayerTimes(now, selectedCity.lat, selectedCity.lng, 3);
+
+            todayPrayers = prayerMeta.map(p => {
+                const t = formatHoursToTime(rawTimes[p.key]);
+                return {
+                    ...p,
+                    hours: t.hours,
+                    minutes: t.minutes,
+                    formatted: t.formatted,
+                    totalMinutes: t.hours * 60 + t.minutes
+                };
+            });
+
+            renderPrayerCards();
+            updateLiveCountdown();
+        }
+
+        function renderPrayerCards(activeKey = null) {
+            const container = document.getElementById('prayer-list-container');
+            container.innerHTML = todayPrayers.map(p => {
+                const isNext = p.key === activeKey;
+                return `
+                    <div class="glass-card ${isNext ? 'active-prayer-glow' : ''} rounded-2xl px-4 py-3.5 flex items-center justify-between transition-all">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-10 h-10 rounded-xl ${isNext ? 'bg-emerald-500 text-white' : 'bg-dark-900 ' + p.color} flex items-center justify-center border border-white/5">
+                                <i data-lucide="${p.icon}" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-sm ${isNext ? 'text-emerald-300' : 'text-white'}">${p.name}</span>
+                                    ${isNext ? '<span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">داهاتوو</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-lg font-extrabold tabular-nums ${isNext ? 'text-amber-400' : 'text-gray-100'}">
+                            ${p.formatted}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        let lastHighlightedKey = null;
+
+        function updateLiveCountdown() {
+            const now = new Date();
+            // Update live clock
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('live-clock').textContent = `${hh}:${mm}:${ss}`;
+
+            if (!todayPrayers.length) return;
+
+            const currentTotalSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+            let nextPrayer = null;
+            let diffSeconds = 0;
+
+            for (let p of todayPrayers) {
+                const pSeconds = p.totalMinutes * 60;
+                if (pSeconds > currentTotalSeconds) {
+                    nextPrayer = p;
+                    diffSeconds = pSeconds - currentTotalSeconds;
+                    break;
+                }
+            }
+
+            // If after Isha, next prayer is tomorrow's Fajr
+            if (!nextPrayer) {
+                nextPrayer = todayPrayers[0];
+                diffSeconds = (24 * 3600 - currentTotalSeconds) + (nextPrayer.totalMinutes * 60);
+            }
+
+            const remH = Math.floor(diffSeconds / 3600);
+            const remM = Math.floor((diffSeconds % 3600) / 60);
+            const remS = diffSeconds % 60;
+
+            document.getElementById('next-prayer-name').textContent = nextPrayer.name;
+            document.getElementById('next-prayer-exact-time').textContent = `کاتژمێر ${nextPrayer.formatted}`;
+            document.getElementById('next-prayer-countdown').textContent =
+                `${String(remH).padStart(2, '0')}:${String(remM).padStart(2, '0')}:${String(remS).padStart(2, '0')}`;
+
+            if (lastHighlightedKey !== nextPrayer.key) {
+                lastHighlightedKey = nextPrayer.key;
+                renderPrayerCards(nextPrayer.key);
+            }
+        }
+
+        // Kurdish Date Display
+        function setKurdishDate() {
+            const now = new Date();
+            const days = ['یەکشەممە', 'دووشەممە', 'سێشەممە', 'چوارشەممە', 'پێنجشەممە', 'هەینی', 'شەممە'];
+            const months = ['کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 'ئایار', 'حوزەیران', 'تەمموز', 'ئاب', 'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'];
+            const text = `${days[now.getDay()]}، ${now.getDate()}ی ${months[now.getMonth()]} ${now.getFullYear()}`;
+            document.getElementById('current-date-display').textContent = text;
+        }
+
+        // City Modal Logic
+        const cityModal = document.getElementById('city-modal');
+        const citiesContainer = document.getElementById('cities-list-container');
+        const citySearchInput = document.getElementById('city-search-input');
+
+        function renderCityList(filterText = '') {
+            const q = filterText.trim().toLowerCase();
+            const filtered = kurdistanCities.filter(c =>
+                c.name.toLowerCase().includes(q) || c.gov.toLowerCase().includes(q)
+            );
+
+            if (filtered.length === 0) {
+                citiesContainer.innerHTML = `<div class="text-center py-8 text-sm text-gray-400">هیچ شار یان قەزایەک نەدۆزرایەوە</div>`;
+                return;
+            }
+
+            citiesContainer.innerHTML = filtered.map(city => {
+                const isSelected = city.id === selectedCity.id;
+                return `
+                    <button type="button" onclick="selectCity('${city.id}')"
+                            class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-right ${isSelected ? 'bg-emerald-500/20 border border-emerald-500/40' : 'bg-dark-800/60 hover:bg-dark-800 border border-transparent'}">
+                        <div>
+                            <span class="block text-sm font-bold ${isSelected ? 'text-emerald-300' : 'text-white'}">${city.name}</span>
+                            <span class="block text-[11px] text-gray-400">${city.gov}</span>
+                        </div>
+                        ${isSelected ? '<i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>' : '<i data-lucide="chevron-left" class="w-4 h-4 text-gray-500"></i>'}
+                    </button>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        window.selectCity = function(cityId) {
+            const found = kurdistanCities.find(c => c.id === cityId);
+            if (found) {
+                selectedCity = found;
+                localStorage.setItem('selectedKurdistanCity', JSON.stringify(found));
+                lastHighlightedKey = null;
+                updateSelectedCityUI();
+                cityModal.classList.add('hidden');
+            }
+        };
+
+        document.getElementById('open-city-modal-btn').addEventListener('click', () => {
+            citySearchInput.value = '';
+            renderCityList();
+            cityModal.classList.remove('hidden');
+            setTimeout(() => citySearchInput.focus(), 100);
+        });
+
+        document.getElementById('close-city-modal-btn').addEventListener('click', () => {
+            cityModal.classList.add('hidden');
+        });
+
+        citySearchInput.addEventListener('input', (e) => {
+            renderCityList(e.target.value);
+        });
+
+        // -------------------------------------------------------------
+        // 4. AZKAR (زیکرەکان) WITH INTERACTIVE DIGITAL TASBIH
+        // -------------------------------------------------------------
+        const azkarData = {
+            morning: [
+                {
+                    arabic: 'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
+                    meaning: 'بەیانیمان کردەوە و موڵک و پاشایەتیش هەر بۆ خودایە، سوپاس و ستایش بۆ خودا، هیچ پەرستراوێکی بەحەق نییە جگە لە اللە.',
+                    target: 1
+                },
+                {
+                    arabic: 'اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ',
+                    meaning: 'خودایە بە فەزڵی تۆ بەیانیمان کردەوە و بە فەزڵی تۆش ئێوارە دەکەینەوە، بە تۆ دەژین و بە تۆش دەمرین و زیندووبوونەوەش هەر بۆ لای تۆیە.',
+                    target: 1
+                },
+                {
+                    arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ: عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ',
+                    meaning: 'پاک و بێگەردی و ستایش بۆ خودا بە ئەندازەی ژمارەی دروستکراوەکانی و ڕەزامەندی خۆی و قورسایی عەرشەکەی و مەرەکەبی وشەکانی.',
+                    target: 3
+                },
+                {
+                    arabic: 'بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',
+                    meaning: 'بە ناوی ئەو خودایەی کە لەگەڵ ناوی ئەودا هیچ شتێک زیان ناگەیەنێت لە زەوی و ئاسماندا و ئەو بیسەر و زانایە.',
+                    target: 3
+                },
+                {
+                    arabic: 'أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ',
+                    meaning: 'داوای لێخۆشبوون لە خودا دەکەم و دەگەڕێمەوە بۆ لای.',
+                    target: 100
+                }
+            ],
+            evening: [
+                {
+                    arabic: 'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
+                    meaning: 'ئێوارەمان کردەوە و موڵک و پاشایەتیش هەر بۆ خودایە، سوپاس و ستایش بۆ خودا.',
+                    target: 1
+                },
+                {
+                    arabic: 'اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ',
+                    meaning: 'خودایە بە فەزڵی تۆ ئێوارەمان کردەوە و بەیانی دەکەینەوە، گەڕانەوەش هەر بۆ لای تۆیە.',
+                    target: 1
+                },
+                {
+                    arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
+                    meaning: 'پەنا دەگرم بە وشە تەواوەکانی خودا لە خراپەی ئەوەی دروستی کردووە.',
+                    target: 3
+                },
+                {
+                    arabic: 'حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ',
+                    meaning: 'خودام بەسە، هیچ پەرستراوێک نییە جگە لەو، پشتم بەو بەستووە و ئەو پەروەردگاری عەرشی گەورەیە.',
+                    target: 7
+                }
+            ],
+            afterPrayer: [
+                {
+                    arabic: 'أَسْتَغْفِرُ اللَّهَ (سێ جار) اللَّهُمَّ أَنْتَ السَّلاَمُ وَمِنْكَ السَّلاَمُ، تَبَارَكْتَ يَا ذَا الْجَلاَلِ وَالإِكْرَامِ',
+                    meaning: 'داوای لێخۆشبوون لە خودا دەکەم (٣ جار). خودایە تۆ سەلام و ئاشتیت و ئاشتیش هەر لە تۆوەیە، بەرەکەتدار و مەزنیت ئەی خاوەن شکۆ و ڕێز.',
+                    target: 1
+                },
+                {
+                    arabic: 'سُبْحَانَ اللَّهِ',
+                    meaning: 'پاک و بێگەردی بۆ خودا (٣٣ جار دوای هەموو نوێژێکی فەرز).',
+                    target: 33
+                },
+                {
+                    arabic: 'الْحَمْدُ لِلَّهِ',
+                    meaning: 'سوپاس و ستایش بۆ خودا (٣٣ جار دوای هەموو نوێژێکی فەرز).',
+                    target: 33
+                },
+                {
+                    arabic: 'اللَّهُ أَكْبَرُ',
+                    meaning: 'خودا لە هەموو شتێک گەورەترە (٣٣ جار دوای هەموو نوێژێکی فەرز).',
+                    target: 33
+                }
+            ],
+            tasbih: [
+                {
+                    arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
+                    meaning: 'دوو وشەن لەسەر زمان سووکن و لە تەرازووی کردەوەکاندا قورسن و لای خودای میهرەبان خۆشەویستن.',
+                    target: 100
+                },
+                {
+                    arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ',
+                    meaning: 'سەڵاواتدان لەسەر پێغەمبەری خۆشەویستمان ﷺ.',
+                    target: 100
+                },
+                {
+                    arabic: 'لاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ',
+                    meaning: 'گەنجینەیەکە لە گەنجینەکانی بەهەشت.',
+                    target: 100
+                }
+            ]
+        };
+
+        let currentAzkarCat = 'morning';
+        let azkarProgress = {}; // { "morning-0": count }
+
+        function renderAzkarList() {
+            const container = document.getElementById('azkar-list-container');
+            const items = azkarData[currentAzkarCat];
+
+            container.innerHTML = items.map((item, idx) => {
+                const key = `${currentAzkarCat}-${idx}`;
+                const currentCount = azkarProgress[key] || 0;
+                const isDone = currentCount >= item.target;
+                const pct = Math.min(100, Math.round((currentCount / item.target) * 100));
+
+                return `
+                    <div onclick="incrementZikr('${key}', ${item.target})"
+                         class="glass-card cursor-pointer select-none active:scale-[0.98] transition-all rounded-2xl p-4 border ${isDone ? 'border-emerald-500/50 bg-emerald-950/20' : 'border-white/5 hover:border-white/15'}">
+                        <p class="font-quran text-xl leading-[2] text-right text-white mb-2.5" dir="rtl">
+                            ${item.arabic}
+                        </p>
+                        <p class="text-xs text-gray-400 leading-relaxed mb-4">
+                            ${item.meaning}
+                        </p>
+                        <div class="flex items-center justify-between pt-2.5 border-t border-white/5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg ${isDone ? 'bg-emerald-500 text-white' : 'bg-dark-900 text-amber-400'}">
+                                    ${isDone ? 'تەواوبوو ✓' : `ژماردن: ${currentCount} / ${item.target}`}
+                                </span>
+                            </div>
+                            <div class="w-24 h-1.5 bg-dark-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 transition-all duration-200" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.incrementZikr = function(key, target) {
+            const cur = azkarProgress[key] || 0;
+            if (cur < target) {
+                azkarProgress[key] = cur + 1;
+                if (navigator.vibrate) navigator.vibrate(25);
+                renderAzkarList();
+            }
+        };
+
+        document.querySelectorAll('.azkar-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.azkar-tab-btn').forEach(b => {
+                    b.classList.remove('active', 'bg-emerald-500', 'text-white', 'shadow-lg', 'shadow-emerald-500/20');
+                    b.classList.add('bg-dark-800', 'text-gray-300');
+                });
+                btn.classList.add('active', 'bg-emerald-500', 'text-white', 'shadow-lg', 'shadow-emerald-500/20');
+                btn.classList.remove('bg-dark-800', 'text-gray-300');
+                currentAzkarCat = btn.dataset.cat;
+                renderAzkarList();
+            });
+        });
+
+        document.getElementById('reset-azkar-btn').addEventListener('click', () => {
+            Object.keys(azkarProgress).forEach(k => {
+                if (k.startsWith(currentAzkarCat)) delete azkarProgress[k];
+            });
+            renderAzkarList();
+        });
+
+        // -------------------------------------------------------------
+        // 5. HOLY QURAN SECTION (CLEAN EMBED + 114 SURAHS READER)
+        // -------------------------------------------------------------
+        let quranLoadedOnce = false;
+        let surahsCached = null;
+
+        function initQuranEmbed() {
+            if (!quranLoadedOnce) {
+                const iframe = document.getElementById('quran-iframe');
+                const loader = document.getElementById('quran-iframe-loader');
+                iframe.src = 'https://quran.com/ar';
+                iframe.onload = () => {
+                    loader.style.display = 'none';
+                };
+                // Fallback hide loader after 3.5s
+                setTimeout(() => { loader.style.display = 'none'; }, 3500);
+                quranLoadedOnce = true;
+            }
+        }
+
+        // Toggle between Full Embedded Quran & Surah List
+        const modeEmbedBtn = document.getElementById('quran-mode-embed');
+        const modeSurahsBtn = document.getElementById('quran-mode-surahs');
+        const embedView = document.getElementById('quran-embed-view');
+        const surahsView = document.getElementById('quran-surahs-view');
+
+        modeEmbedBtn.addEventListener('click', () => {
+            modeEmbedBtn.classList.add('bg-emerald-500', 'text-white', 'shadow');
+            modeEmbedBtn.classList.remove('text-gray-400');
+            modeSurahsBtn.classList.remove('bg-emerald-500', 'text-white', 'shadow');
+            modeSurahsBtn.classList.add('text-gray-400');
+            embedView.classList.remove('hidden');
+            surahsView.classList.add('hidden');
+            initQuranEmbed();
+        });
+
+        modeSurahsBtn.addEventListener('click', () => {
+            modeSurahsBtn.classList.add('bg-emerald-500', 'text-white', 'shadow');
+            modeSurahsBtn.classList.remove('text-gray-400');
+            modeEmbedBtn.classList.remove('bg-emerald-500', 'text-white', 'shadow');
+            modeEmbedBtn.classList.add('text-gray-400');
+            surahsView.classList.remove('hidden');
+            embedView.classList.add('hidden');
+            loadSurahsList();
+        });
+
+        async function loadSurahsList() {
+            const grid = document.getElementById('surah-list-grid');
+            if (surahsCached) {
+                renderSurahsGrid(surahsCached);
+                return;
+            }
+            grid.innerHTML = `<div class="text-center py-8 text-xs text-gray-400">بارکردنی ١١٤ سوڕەتی قورئانی پیرۆز...</div>`;
+            try {
+                const res = await fetch('https://api.alquran.cloud/v1/surah');
+                const data = await res.json();
+                surahsCached = data.data;
+                renderSurahsGrid(surahsCached);
+            } catch (e) {
+                grid.innerHTML = `<div class="text-center py-8 text-xs text-rose-400">تکایە دڵنیابە لە بوونی ئینتەرنێت</div>`;
+            }
+        }
+
+        function renderSurahsGrid(list) {
+            const grid = document.getElementById('surah-list-grid');
+            grid.innerHTML = list.map(s => `
+                <button onclick="openSurahReader(${s.number}, '${s.name}', '${s.revelationType}')"
+                        class="glass-card hover:bg-dark-800 rounded-xl p-3.5 flex items-center justify-between text-right transition-all">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 font-bold text-xs flex items-center justify-center">
+                            ${s.number}
+                        </span>
+                        <div>
+                            <span class="font-quran text-lg font-bold text-white block">${s.name}</span>
+                            <span class="text-[11px] text-gray-400">${s.revelationType === 'Meccan' ? 'مەککی' : 'مەدەنی'} • ${s.numberOfAyahs} ئایەت</span>
+                        </div>
+                    </div>
+                    <i data-lucide="book-open-check" class="w-4 h-4 text-amber-400"></i>
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        document.getElementById('surah-search-input').addEventListener('input', (e) => {
+            if (!surahsCached) return;
+            const q = e.target.value.trim();
+            const filtered = surahsCached.filter(s => s.name.includes(q) || String(s.number) === q);
+            renderSurahsGrid(filtered);
+        });
+
+        window.openSurahReader = async function(num, name, revType) {
+            const grid = document.getElementById('surah-list-grid');
+            const readerBox = document.getElementById('surah-reader-box');
+            const ayahsDiv = document.getElementById('reader-ayahs-content');
+
+            document.getElementById('reader-surah-title').textContent = name;
+            document.getElementById('reader-surah-meta').textContent = revType === 'Meccan' ? 'مەککی' : 'مەدەنی';
+
+            grid.classList.add('hidden');
+            readerBox.classList.remove('hidden');
+            ayahsDiv.innerHTML = `<div class="text-center py-10 text-sm font-sans text-gray-400">بارکردنی ئایەتەکان...</div>`;
+
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}`);
+                const data = await res.json();
+                const ayahs = data.data.ayahs;
+                ayahsDiv.innerHTML = ayahs.map(a => `
+                    <span>${a.text}</span>
+                    <span class="inline-flex items-center justify-center text-sm font-sans text-amber-400 bg-amber-500/10 rounded-full px-2 py-0.5 mx-1">﴿${a.numberInSurah}﴾</span>
+                `).join(' ');
+            } catch (e) {
+                ayahsDiv.innerHTML = `<div class="text-center py-8 text-sm font-sans text-rose-400">هەڵەیەک ڕوویدا لە کاتی کردنەوەی سوڕەتەکە</div>`;
+            }
+        };
+
+        document.getElementById('back-to-surahs-btn').addEventListener('click', () => {
+            document.getElementById('surah-reader-box').classList.add('hidden');
+            document.getElementById('surah-list-grid').classList.remove('hidden');
+        });
+
+        // -------------------------------------------------------------
+        // 6. BOTTOM NAVIGATION TAB SWITCHING (ISOLATED VIEWS)
+        // -------------------------------------------------------------
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.app-section');
+        const headerTitle = document.getElementById('header-title');
+
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+                const titleText = btn.dataset.title;
+
+                // Update Active Tab Styles
+                navButtons.forEach(b => {
+                    b.classList.remove('active', 'text-emerald-400', 'bg-emerald-500/10');
+                    b.classList.add('text-gray-400');
+                });
+                btn.classList.add('active', 'text-emerald-400', 'bg-emerald-500/10');
+                btn.classList.remove('text-gray-400');
+
+                // Switch Section Cleanly
+                sections.forEach(sec => sec.classList.remove('active'));
+                document.getElementById(targetId).classList.add('active');
+
+                // Update Top Header Title
+                headerTitle.textContent = titleText;
+
+                // Lazy load Quran embed only when tab 3 is clicked
+                if (targetId === 'section-quran') {
+                    initQuranEmbed();
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // -------------------------------------------------------------
+        // 7. INITIALIZE APP ON LOAD
+        // -------------------------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            setKurdishDate();
+            updateSelectedCityUI();
+            renderAzkarList();
+            setInterval(updateLiveCountdown, 1000);
+        });
+    </script>
+</body>
+</html>
